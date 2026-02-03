@@ -1,0 +1,150 @@
+name: Windows Release & Auto-Update
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4  # <--- MISE À JOUR v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4 # <--- MISE À JOUR v4
+      with:
+        dotnet-version: 10.0.x
+    
+    - name: Install MAUI Workload
+      run: dotnet workload install maui-android maui-ios maui-maccatalyst maui-windows
+
+    - name: Build, Import Cert and Publish
+      env:
+        PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
+      run: |
+        run: |
+        # --- CONFIGURATION (A REMPLACER !) ---
+        $BaseUrl = "https://samidanak.github.io/Budget.API"
+        # -------------------------------------
+
+        # 1. PRÉPARATION DU CERTIFICAT
+        $pfx_bytes = [System.Convert]::FromBase64String("${{ secrets.WINDOWS_PFX_BASE64 }}")
+        $pfxPath = "Budget.Mobile\BudgetApp_Windows.pfx"
+        [IO.File]::WriteAllBytes($pfxPath, $pfx_bytes)
+
+        # 2. IMPORTATION DU CERTIFICAT
+        $passwordSecure = ConvertTo-SecureString -String "$env:PFX_PASSWORD" -AsPlainText -Force
+        $cert = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $passwordSecure
+        if (-not $cert) { Write-Error "Erreur Import Certificat"; exit 1 }
+        $thumbprint = $cert.Thumbprint
+        Write-Host "Certificat OK. Thumbprint: $thumbprint"
+
+        # 3. COMPILATION DU MSIX (On ne demande plus l'appinstaller ici)
+        dotnet publish Budget.Mobile/Budget.Mobile.csproj `
+          -f net10.0-windows10.0.19041.0 `
+          -c Release `
+          /p:WindowsPackageType=MSIX `
+          /p:GenerateAppxPackageOnBuild=true `
+          /p:AppxPackageSigningEnabled=true `
+          /p:PackageCertificateThumbprint="$thumbprint" `
+          /p:UapAppxPackageBuildMode=SideloadOnly
+
+        # 4. RÉCUPÉRATION DU FICHIER MSIX GÉNÉRÉ
+        $msixFile = Get-ChildItem -Path Budget.Mobile -Recurse -Filter *.msix | Select-Object -First 1
+        if (-not $msixFile) { Write-Error "CRITIQUE: Aucun fichier .msix trouvé !"; exit 1 }
+        
+        Write-Host "Fichier MSIX trouvé : $($msixFile.Name)"
+
+        # On extrait la version du nom du fichier (ex: Budget_1.0.0.0_x64.msix)
+        $fileName = $msixFile.Name
+        if ($fileName -match "_([\d\.]+)_") { $version = $matches[1] } else { $version = "1.0.0.0" }
+        Write-Host "Version détectée : $version"
+
+        # 5. GÉNÉRATION MANUELLE DU .APPINSTALLER (La méthode infaillible)
+        $appInstallerContent = @"
+        <?xml version="1.0" encoding="utf-8"?>
+        <AppInstaller Uri="$BaseUrl/Budget.appinstaller" Version="$version" xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
+            <MainPackage Name="com.tonnom.budgetapp" Version="$version" Publisher="CN=BudgetApp" Uri="$BaseUrl/$fileName" />
+        </AppInstaller>
+        "@
+        
+        # 6. GÉNÉRATION D'UNE PAGE DE TÉLÉCHARGEMENT HTML
+        $htmlContent = @"
+        <html>
+        <head><title>Installer Budget App</title></head>
+        <body style="font-family:sans-serif; text-align:center; padding-top:50px;">
+            <h1>Budget App Windows 💸</h1>
+            <p>Version actuelle : $version</p>
+            <a href="ms-appinstaller:?source=$BaseUrl/Budget.appinstaller" style="background-color:#0078D7; color:white; padding:15px 30px; text-decoration:none; font-size:20px; border-radius:5px;">
+                🚀 INSTALLER L'APPLICATION
+            </a>
+            <p><small>Si le bouton ne marche pas, <a href="$fileName">télécharger le fichier MSIX</a>.</small></p>
+        </body>
+        </html>
+        "@
+
+        # 7. PRÉPARATION DU DOSSIER FINAL (_site)
+        mkdir _site -Force
+        
+        # On écrit les fichiers générés
+        Set-Content -Path "_site\Budget.appinstaller" -Value $appInstallerContent
+        Set-Content -Path "_site\index.html" -Value $htmlContent
+        
+        # On copie le MSIX
+        Copy-Item $msixFile.FullName -Destination "_site\$fileName"
+        
+        # On copie le certificat public (pour l'installation manuelle si besoin)
+        $certPublic = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+        [IO.File]::WriteAllBytes("_site\BudgetApp.cer", $certPublic)
+
+        Write-Host "Terminé ! Contenu du dossier _site :"
+        Get-ChildItem _site
+
+    - name: Prepare Site for GitHub Pages
+      run: |
+        mkdir _site
+        
+        # 4. RECHERCHE ET COPIE
+        Write-Host "Recherche des fichiers générés..."
+        $appInstallerFile = Get-ChildItem -Path Budget.Mobile -Recurse -Filter *.appinstaller | Select-Object -First 1
+        
+        if ($appInstallerFile) {
+            Write-Host "SUCCÈS ! Fichier trouvé : $($appInstallerFile.FullName)"
+            
+            # Copie du dossier contenant le .appinstaller et le .msix
+            Copy-Item "$($appInstallerFile.DirectoryName)\*" -Destination _site -Recurse -Force
+            
+            # Petite vérification visuelle dans les logs
+            Get-ChildItem _site
+        } else {
+            Write-Error "ÉCHEC : Aucun fichier .appinstaller trouvé."
+            # On liste tout pour comprendre où sont passés les fichiers
+            Get-ChildItem Budget.Mobile -Recurse -Include *.msix, *.appinstaller
+            exit 1
+        }
+            
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3 # <--- MISE À JOUR v3 (Crucial pour corriger l'erreur)
+      with:
+        path: _site
+
+  deploy-pages:
+    needs: build-windows
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # <--- MISE À JOUR v4

@@ -1,0 +1,89 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             xmlns:converters="clr-namespace:Budget.Mobile.Converters"
+             x:Class="Budget.Mobile.Views.TransactionsPage"
+             x:DataType="viewmodels:TransactionsViewModel"
+             Title="Historique"
+             BackgroundColor="#F5F5F5">
+
+    <ContentPage.Resources>
+        <converters:AmountColorConverter x:Key="ColorConverter"/>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Frame Grid.Row="0" Margin="10" Padding="10" BackgroundColor="White" CornerRadius="10">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Filtres" FontAttributes="Bold"/>
+                <Picker Title="Catégorie" 
+                        ItemsSource="{Binding CategoriesDisponibles}" 
+                        SelectedItem="{Binding CategorieFiltre}"
+                        ItemDisplayBinding="{Binding ., Converter={StaticResource CatNameConverter}}"
+                        SelectedIndexChanged="Picker_SelectedIndexChanged"/>
+                <HorizontalStackLayout Spacing="15" HorizontalOptions="Center">
+                    <HorizontalStackLayout Spacing="5">
+                        <CheckBox IsChecked="{Binding AfficherRevenus}" CheckedChanged="CheckBox_CheckedChanged"/>
+                        <Label Text="Revenus" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <CheckBox IsChecked="{Binding AfficherDepenses}" CheckedChanged="CheckBox_CheckedChanged"/>
+                        <Label Text="Dépenses" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+                <Button Grid.Column="2" Text="Reset" Command="{Binding ResetFiltresCommand}" 
+                        FontSize="10" HeightRequest="30" Padding="5,0"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding TransactionsAffichees}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Depense">
+
+                    <SwipeView>
+
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Supprimer"
+                                   BackgroundColor="#FF3B30"
+                                   IsDestructive="True"
+                                   Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:TransactionsViewModel}}, Path=SupprimerCommand}"
+                                   CommandParameter="{Binding .}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Frame Margin="10, 5" Padding="10" CornerRadius="8" HasShadow="False" BackgroundColor="White">
+                            <Grid ColumnDefinitions="*, Auto">
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding Description}" FontAttributes="Bold" FontSize="14"/>
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="{Binding Categorie, Converter={StaticResource CatNameConverter}}" FontSize="11" TextColor="Gray"/>
+                                        <Label Text="|" TextColor="LightGray"/>
+                                        <Label Text="{Binding Date_Depense, StringFormat='{0:dd MMM yyyy}'}" FontSize="11" TextColor="Gray"/>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="1" 
+                               FontAttributes="Bold" 
+                               FontSize="16"
+                               VerticalOptions="Center"
+                               TextColor="{Binding Est_Revenu, Converter={StaticResource ColorConverter}}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Est_Revenu}" Value="True">
+                                            <Setter Property="Text" Value="{Binding Montant, StringFormat='+ {0:C}'}"/>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Est_Revenu}" Value="False">
+                                            <Setter Property="Text" Value="{Binding Montant, StringFormat='- {0:C}'}"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Frame>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

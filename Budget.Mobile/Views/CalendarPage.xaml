@@ -1,0 +1,81 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             x:Class="Budget.Mobile.Views.CalendarPage"
+             x:DataType="viewmodels:CalendarViewModel"
+             Title="Bilan Annuel"
+             BackgroundColor="#F5F5F5">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <Frame Grid.Row="0" Margin="10" Padding="15" CornerRadius="15" BackgroundColor="#2C3E50">
+            <VerticalStackLayout Spacing="10">
+
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <Button Text="&lt;" Command="{Binding ChangerAnneeCommand}" CommandParameter="{x:Int32 -1}" 
+                            BackgroundColor="Transparent" TextColor="White" FontSize="20"/>
+
+                    <Label Grid.Column ="1" Text="{Binding AnneeSelectionnee}" 
+                           TextColor="White" FontSize="24" FontAttributes="Bold" 
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+
+                    <Button Grid.Column ="2" Text="&gt;" Command="{Binding ChangerAnneeCommand}" CommandParameter="{x:Int32 1}" 
+                            BackgroundColor="Transparent" TextColor="White" FontSize="20"/>
+                </Grid>
+
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5"/>
+
+                <Grid ColumnDefinitions="*, *, *">
+                    <VerticalStackLayout>
+                        <Label Text="Entrées" TextColor="#AAAAAA" HorizontalOptions="Center" FontSize="10"/>
+                        <Label Text="{Binding TotalRevenusAnnee, StringFormat='{0:C0}'}" TextColor="#27AE60" HorizontalOptions="Center" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Sorties" TextColor="#AAAAAA" HorizontalOptions="Center" FontSize="10"/>
+                        <Label Text="{Binding TotalDepensesAnnee, StringFormat='{0:C0}'}" TextColor="#E74C3C" HorizontalOptions="Center" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Économie" TextColor="#AAAAAA" HorizontalOptions="Center" FontSize="10"/>
+                        <Label Text="{Binding SoldeAnnee, StringFormat='{0:C0}'}" TextColor="White" HorizontalOptions="Center" FontAttributes="Bold"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding MoisDeLAnnee}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ResumeMois">
+                    <Frame Margin="10, 5" Padding="15" CornerRadius="10" BackgroundColor="White">
+                        <Grid ColumnDefinitions="2*, *, *, *">
+
+                            <Label Grid.Column="0" Text="{Binding NomMois}" 
+                                   VerticalOptions="Center" FontAttributes="Bold" FontSize="16"/>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="+" TextColor="Gray" FontSize="8" HorizontalOptions="Center"/>
+                                <Label Text="{Binding TotalRevenus, StringFormat='{0:N0}'}" 
+                                       TextColor="#27AE60" FontSize="12" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
+                                <Label Text="-" TextColor="Gray" FontSize="8" HorizontalOptions="Center"/>
+                                <Label Text="{Binding TotalDepenses, StringFormat='{0:N0}'}" 
+                                       TextColor="#E74C3C" FontSize="12" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="3" VerticalOptions="Center">
+                                <Label Text="=" TextColor="Gray" FontSize="8" HorizontalOptions="Center"/>
+                                <Label Text="{Binding Solde, StringFormat='{0:N0}'}" 
+                                       FontAttributes="Bold" FontSize="12" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

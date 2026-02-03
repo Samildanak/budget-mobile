@@ -1,0 +1,123 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             x:Class="Budget.Mobile.Views.AddTransactionPage"
+             x:DataType="viewmodels:AddTransactionViewModel"
+             Title="Nouvelle Transaction"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+
+            <Frame CornerRadius="15" BackgroundColor="White" Padding="20">
+                <VerticalStackLayout Spacing="15">
+
+                    <Grid ColumnDefinitions="*, Auto">
+                        <Label Text="Est-ce un revenu ?" VerticalOptions="Center" TextColor="Gray"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding EstRevenu}" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#EEEEEE"/>
+
+                    <VerticalStackLayout>
+                        <Label Text="Description" TextColor="#2C3E50" FontAttributes="Bold"/>
+                        <Entry Text="{Binding Description}" Placeholder="Ex: Courses, Loyer..." />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout>
+                        <Label Text="Montant ($)" TextColor="#2C3E50" FontAttributes="Bold"/>
+                        <Entry Text="{Binding Montant}" Keyboard="Numeric" Placeholder="0.00" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout>
+                        <Label Text="Date" TextColor="#2C3E50" FontAttributes="Bold"/>
+                        <DatePicker Date="{Binding DateTransaction}" Format="dd MMMM yyyy"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout>
+                        <Label Text="Catégorie" TextColor="#2C3E50" FontAttributes="Bold"/>
+                        <Picker Title="Choisir une catégorie"
+                                ItemsSource="{Binding Categories}"
+                                SelectedItem="{Binding CategorieSelectionnee}"
+                                ItemDisplayBinding="{Binding ., Converter={StaticResource CatNameConverter}}" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <Button Text="Ajouter la transaction" 
+                    Command="{Binding SauvegarderCommand}"
+                    BackgroundColor="#2C3E50"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsDesktop}" Value="True">
+                        <Setter Property="Text" Value="Ajouter à la liste 👇" />
+                        <Setter Property="BackgroundColor" Value="#512BD4" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsDesktop}" Value="False">
+                        <Setter Property="Text" Value="Sauvegarder et Quitter" />
+                        <Setter Property="BackgroundColor" Value="Green" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <VerticalStackLayout IsVisible="{Binding IsDesktop}" Spacing="10" Margin="0,20,0,0">
+
+                <Label Text="Dépenses en attente de validation :" 
+                       FontAttributes="Bold" FontSize="18" TextColor="Gray"/>
+
+                <CollectionView ItemsSource="{Binding DepensesEnAttente}" HeightRequest="300">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Depense">
+                            <Grid Padding="10" ColumnDefinitions="*, Auto, Auto">
+                                <VerticalStackLayout Grid.Column="0">
+                                    <Label Text="{Binding Description}" FontAttributes="Bold" />
+                                    <Label Text="{Binding Categorie}" FontSize="12" TextColor="Gray" />
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="1" 
+                                       VerticalOptions="Center" 
+                                       Margin="0,0,15,0"
+                                       FontAttributes="Bold">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Est_Revenu}" Value="True">
+                                            <Setter Property="TextColor" Value="Green" />
+                                            <Setter Property="Text" Value="{Binding Montant, StringFormat='+ {0:C}'}" />
+                                        </DataTrigger>
+
+                                        <DataTrigger TargetType="Label" Binding="{Binding Est_Revenu}" Value="False">
+                                            <Setter Property="TextColor" Value="Red" />
+                                            <Setter Property="Text" Value="{Binding Montant, StringFormat='- {0:C}'}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                                <Button Grid.Column="2" 
+                                        Text="🗑️" 
+                                        BackgroundColor="Transparent"
+                                        TextColor="Red"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AddTransactionViewModel}}, Path=SupprimerLigneCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.EmptyView>
+                        <Label Text="Aucune dépense dans la liste temporaire." HorizontalOptions="Center" TextColor="Silver"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+                <Button Text="TOUT VALIDER VERS LA BDD" 
+                        Command="{Binding ValiderLeLotCommand}"
+                        BackgroundColor="DarkGreen"
+                        HeightRequest="60"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        IsEnabled="{Binding DepensesEnAttente.Count, Converter={StaticResource IntToBoolConverter}}" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

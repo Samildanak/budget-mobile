@@ -1,0 +1,76 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             xmlns:micro="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             x:DataType="viewmodels:DashboardViewModel"
+             x:Class="Budget.Mobile.Views.DashboardPage"
+             Title="Tableau de Bord"
+             BackgroundColor="#F5F5F5">
+    <Grid RowDefinitions="Auto, Auto, *" Padding="20" RowSpacing="20">
+
+        <Frame Grid.Row="0" BackgroundColor="#2C3E50" CornerRadius="20" HasShadow="True" HeightRequest="150">
+            <VerticalStackLayout VerticalOptions="Center" Spacing="5">
+                <Label Text="Solde Total" TextColor="#AAAAAA" HorizontalOptions="Center"/>
+                <Label Text="{Binding Solde, StringFormat='{0:C}'}" 
+                       TextColor="White" 
+                       FontSize="40" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="15">
+
+            <Frame Grid.Column="0" CornerRadius="15" Padding="15">
+                <VerticalStackLayout>
+                    <Label Text="Entrées" TextColor="Gray" FontSize="12"/>
+                    <Label Text="{Binding TotalRevenus, StringFormat='{0:C}'}" 
+                           TextColor="#27AE60" FontSize="20" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Grid.Column="1" CornerRadius="15" Padding="15">
+                <VerticalStackLayout>
+                    <Label Text="Sorties" TextColor="Gray" FontSize="12"/>
+                    <Label Text="{Binding TotalDepenses, StringFormat='{0:C}'}" 
+                           TextColor="#E74C3C" FontSize="20" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+        <Frame Grid.Row="2" CornerRadius="20" Padding="15" Margin="0,10,0,0" BackgroundColor="White">
+            <Grid ColumnDefinitions="2*, 1*">
+                <micro:ChartView Grid.Column="0" 
+                         Chart="{Binding GraphiqueDepenses}" 
+                         HeightRequest="200"/>
+
+                <CollectionView Grid.Column="1" 
+                        ItemsSource="{Binding MaLegende}"
+                        VerticalOptions="Center">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ItemLegende">
+                            <HorizontalStackLayout Spacing="8" Margin="0,4">
+
+                                <BoxView Color="{Binding Couleur}" 
+                                 HeightRequest="12" 
+                                 WidthRequest="12" 
+                                 CornerRadius="3"
+                                 VerticalOptions="Center"/>
+
+                                <Label Text="{Binding Nom}" 
+                               FontSize="11" 
+                               TextColor="Gray"
+                               VerticalOptions="Center"
+                               LineBreakMode="TailTruncation"/>
+
+                            </HorizontalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </Grid>
+        </Frame>
+
+    </Grid>
+</ContentPage>

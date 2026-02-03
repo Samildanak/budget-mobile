@@ -1,0 +1,46 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             x:DataType="viewmodels:BudgetViewModel"
+             x:Class="Budget.Mobile.Views.BudgetPage"
+             Title="Suivi Budget"
+             BackgroundColor="#F5F5F5">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Définir le Budget" 
+                     Order="Primary"
+                     Command="{Binding AllerVersEditionCommand}"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto, *">
+        <Frame Grid.Row="0" Margin="10" Padding="15" BackgroundColor="White" CornerRadius="10">
+            <Label Text="État de santé budgétaire (Janvier - Aujourd'hui)" 
+                   HorizontalOptions="Center" FontAttributes="Bold"/>
+        </Frame>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding LignesBudget}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:BudgetRow">
+                    <Frame Margin="10,5" Padding="15" CornerRadius="10" BackgroundColor="White">
+                        <VerticalStackLayout Spacing="5">
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <Label Grid.Column="0" Text="{Binding Nom}" FontAttributes="Bold" FontSize="16"/>
+                                <Label Grid.Column="1" Text="{Binding DetailsReste}" TextColor="{Binding CouleurBarre}" FontAttributes="Bold"/>
+                            </Grid>
+
+                            <ProgressBar Progress="{Binding ProgressionBarre}" 
+                                         ProgressColor="{Binding CouleurBarre}"
+                                         ScaleY="2"  
+                                         Margin="0,5"/>
+                            <Label Text="{Binding DetailsCompteur}" 
+                                   TextColor="Gray" 
+                                   FontSize="12" 
+                                   HorizontalOptions="End"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

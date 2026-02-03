@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="Budget.Mobile.Views.EditBudgetPage"
+             x:DataType="viewmodels:EditBudgetViewModel"
+             Title="Définition du Budget"
+             BackgroundColor="#F0F0F0">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+
+        <Border Grid.Row="0" Margin="10" Padding="10" BackgroundColor="White">
+            <Grid ColumnDefinitions="*, Auto">
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Text="Configuration" FontAttributes="Bold" FontSize="16"/>
+                    <Label Text="Ajustez vos plafonds mensuels" TextColor="Gray" FontSize="12"/>
+                </VerticalStackLayout>
+
+                <HorizontalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
+                    <Label Text="Aide (Moyenne)" VerticalOptions="Center" FontSize="12"/>
+                    <Switch IsToggled="{Binding AfficherMoyennes}"/>
+                </HorizontalStackLayout>
+            </Grid>
+        </Border>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding LignesEdition}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:LigneBudget">
+                    <Border Margin="10, 5" Padding="15">
+                        <Grid ColumnDefinitions="*, Auto, 80" ColumnSpacing="10">
+
+                            <Label Grid.Column="0" 
+                                   Text="{Binding NomCategorie}" 
+                                   VerticalOptions="Center" 
+                                   FontAttributes="Bold"/>
+
+                            <VerticalStackLayout Grid.Column="1" 
+                                                 VerticalOptions="Center"
+                                                 IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:EditBudgetViewModel}}, Path=AfficherMoyennes}">
+                                <Label Text="Moyenne" FontSize="10" TextColor="Gray" HorizontalOptions="End"/>
+                                <Label Text="{Binding MoyenneDepenseReelle, StringFormat='{0:C0}'}" 
+                                       FontSize="12" TextColor="Gray" HorizontalOptions="End"/>
+                            </VerticalStackLayout>
+
+                            <Entry Grid.Column="2" 
+                                   Text="{Binding PlafondDefini}" 
+                                   Keyboard="Numeric"
+                                   HorizontalTextAlignment="End"
+                                   Placeholder="0"
+                                   TextChanged="Entry_Completed"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Border Grid.Row="2" Margin="0" Padding="20" BackgroundColor="White">
+            <VerticalStackLayout Spacing="15">
+
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Revenus Estimés (Mensuel)" VerticalOptions="Center"/>
+                    <Entry Grid.Column="1" 
+                           Text="{Binding RevenuEstime}" 
+                           Keyboard="Numeric" 
+                           WidthRequest="100" 
+                           HorizontalTextAlignment="End"/>
+                </Grid>
+
+                <BoxView HeightRequest="1" Color="LightGray"/>
+
+                <Grid ColumnDefinitions="*, Auto">
+                    <Label Text="Total Budget Configuré" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Column="1" 
+                           Text="{Binding TotalBudgetConfigure, StringFormat='{0:C}'}" 
+                           TextColor="{Binding CouleurTotalBudget}" 
+                           FontAttributes="Bold" 
+                           FontSize="18"/>
+                </Grid>
+
+                <Button Text="Valider le Budget" 
+                        Command="{Binding SauvegarderToutCommand}"
+                        BackgroundColor="#2C3E50"
+                        TextColor="White"
+                        CornerRadius="10"
+                        Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

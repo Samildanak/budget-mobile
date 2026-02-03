@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             x:Class="Budget.Mobile.MainPage"
+             x:DataType="viewmodels:DepensesViewModel"
+             Title="Mon Budget">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *">
+        <Frame BackgroundColor="#2C3E50" Padding="20" Margin="0,0,0,10">
+            <VerticalStackLayout>
+                <Label Text="Solde Actuel" 
+               TextColor="White" 
+               HorizontalOptions="Center" 
+               FontSize="14"/>
+
+                <Label Text="{Binding Solde, StringFormat='{0:C}'}" 
+               TextColor="White" 
+               HorizontalOptions="Center" 
+               FontSize="36" 
+               FontAttributes="Bold"/>
+
+                <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                    <VerticalStackLayout>
+                        <Label Text="Total des dépenses" TextColor="White" />
+                        <Label Text="{Binding TotalDepenses, StringFormat='{0:C}'}" TextColor="Red"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout>
+                        <Label Text="Total des revenus" TextColor="White" />
+                        <Label Text="{Binding TotalRevenus, StringFormat='{0:C}'}" TextColor="Green"/>
+                    </VerticalStackLayout>
+                    
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <VerticalStackLayout Grid.Row="1">
+            <Label Text="Description"/>
+            <Entry Text="{Binding NouvelleDescription}"/>
+            <Label Text="Montant"/>
+            <Entry Text="{Binding Montant}" Keyboard="Numeric"/>
+            <HorizontalStackLayout Spacing="10">
+                <Label Text="Est-ce un revenu ?" VerticalOptions="Center"/>
+                <Switch IsToggled="{Binding EstRevenu}" />
+            </HorizontalStackLayout>
+            <Label Text="Catégorie"/>
+            <Picker Title="Sélectionner une catégorie"
+                    ItemsSource="{Binding CategoriesDisponibles}"
+                    SelectedItem="{Binding CategorieSelectionnee}"
+                    ItemDisplayBinding="{Binding Texte}"
+                    BackgroundColor="#F0F0F0"/>
+            <DatePicker Date="{Binding Date}"/>
+            <Button Text="Valider" Command="{Binding AjouterDepenseCommand}"/>
+        </VerticalStackLayout>
+
+        <Button Grid.Row="2" 
+                Text="Charger les dépenses"
+                Command="{Binding ChargerDepensesCommand}"
+                Margin="10"
+                BackgroundColor="#512BD4"
+                TextColor="White"/>
+
+        <CollectionView Grid.Row="3" 
+                        ItemsSource="{Binding ListeDepenses}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Depense">
+                    <Frame Margin="10,5" Padding="10">
+                        <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="{Binding Description}" FontAttributes="Bold" FontSize="16"/>
+                                <Label Text="{Binding Categorie}" TextColor="Gray" FontSize="12"/>
+                                <Label Text="{Binding Date_Depense, StringFormat='{0:dd/MM/yyyy}'}" TextColor="Gray" FontSize="12"/>
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="1" 
+                                   Text="{Binding MontantFormate}" 
+                                   TextColor="{Binding CouleurAffichage}" 
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,10,0"/>
+                            <Button Grid.Column="2" Text="Modifier" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:DepensesViewModel}}, Path=RemplirFormulaireCommand}"
+                                    CommandParameter="{Binding .}" BackgroundColor="Blue"/>
+                            <Button Grid.Column="3" Text="X" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:DepensesViewModel}}, Path=SupprimerDepenseCommand}"
+                                    CommandParameter="{Binding .}" BackgroundColor="Red"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>
