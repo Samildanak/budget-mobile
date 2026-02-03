@@ -28,18 +28,26 @@
 		<ApplicationId>com.samildanak.budgetapp</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
-		<GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
 
-		<AppInstallerUri>https://samildanak.github.io/Budget.API/</AppInstallerUri>
+    <WindowsPackageType>None</WindowsPackageType>
+    <PublishProtocol>ClickOnce</PublishProtocol>
+    <ClickOncePublishVersion>1.0.0.0</ClickOncePublishVersion>
+    <ClickOnceAutoUpdate>true</ClickOnceAutoUpdate>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
 
-		<AppInstallerUpdateFrequency>0</AppInstallerUpdateFrequency>
-		<AppInstallerCheckForUpdateFrequency>OnApplicationRun</AppInstallerCheckForUpdateFrequency>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPageFileName>index.html</WebPageFileName>
 
-		<!-- To develop, package, and publish an app to the Microsoft Store, see:
-		https://aka.ms/MauiTemplateUnpackaged -->
-		<WindowsPackageType>None</WindowsPackageType>
+    <InstallUrl>https://samildanak.github.io/budget-mobile/</InstallUrl>
+    <UpdateUrl>https://samildanak.github.io/budget-mobile/</UpdateUrl>
+
+    <SignatureAlgorithm>(none)</SignatureAlgorithm>
+    <SignManifests>false</SignManifests>
 
 		<SupportedOSPlatformVersion
 			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
