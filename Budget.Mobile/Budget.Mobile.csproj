@@ -51,8 +51,6 @@
 
 		<EnableDefaultMauiImageItems>false</EnableDefaultMauiImageItems>
 
-		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<SupportedOSPlatformVersion
@@ -113,5 +111,13 @@
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 	</ItemGroup>
+	<ItemGroup>
+		<Content Remove="Budget.Mobile.dll" />
+		<None Include="Budget.Mobile.dll">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
 
 </Project>
