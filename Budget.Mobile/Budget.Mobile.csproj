@@ -28,30 +28,32 @@
 		<ApplicationId>com.samildanak.budgetapp</ApplicationId>
 
 		<!-- Versions -->
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
 
-    <WindowsPackageType>None</WindowsPackageType>
-    <PublishProtocol>ClickOnce</PublishProtocol>
-    <ClickOncePublishVersion>1.0.0.0</ClickOncePublishVersion>
-    <ClickOnceAutoUpdate>true</ClickOnceAutoUpdate>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
+		<WindowsPackageType>None</WindowsPackageType>
+		<PublishProtocol>ClickOnce</PublishProtocol>
+		<ClickOncePublishVersion>1.0.0.0</ClickOncePublishVersion>
+		<ClickOnceAutoUpdate>true</ClickOnceAutoUpdate>
+		<Install>true</Install>
+		<InstallFrom>Web</InstallFrom>
+		<UpdateEnabled>true</UpdateEnabled>
+		<UpdateMode>Foreground</UpdateMode>
 
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
-    <WebPageFileName>index.html</WebPageFileName>
+		<CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+		<WebPageFileName>index.html</WebPageFileName>
 
-    <InstallUrl>https://samildanak.github.io/budget-mobile/</InstallUrl>
-    <UpdateUrl>https://samildanak.github.io/budget-mobile/</UpdateUrl>
+		<InstallUrl>https://samildanak.github.io/budget-mobile/</InstallUrl>
+		<UpdateUrl>https://samildanak.github.io/budget-mobile/</UpdateUrl>
 
-    <SignatureAlgorithm>(none)</SignatureAlgorithm>
-    <SignManifests>false</SignManifests>
+		<SignatureAlgorithm>(none)</SignatureAlgorithm>
+		<SignManifests>false</SignManifests>
 
-    <EnableDefaultMauiImageItems>false</EnableDefaultMauiImageItems>
+		<EnableDefaultMauiImageItems>false</EnableDefaultMauiImageItems>
 
-    <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<SupportedOSPlatformVersion
 			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
@@ -69,20 +71,20 @@
 			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 			10.0.17763.0</TargetPlatformMinVersion>
 	</PropertyGroup>
-  <ItemGroup>
-    <MauiIcon Include="Resources\AppIcon\appicon.svg"
+	<ItemGroup>
+		<MauiIcon Include="Resources\AppIcon\appicon.svg"
 			ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-    <MauiImage Include="Resources\Images\*" Exclude="Resources\Images\dotnet_bot.png" />
+		<MauiImage Include="Resources\Images\*" Exclude="Resources\Images\dotnet_bot.png" />
 
-    <MauiImage Include="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+		<MauiImage Include="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 
-    <MauiFont Include="Resources\Fonts\*" />
+		<MauiFont Include="Resources\Fonts\*" />
 
-    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microcharts.Maui" Version="1.0.1" />
