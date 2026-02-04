@@ -31,7 +31,7 @@ jobs:
       - name: Publish for Windows
         # CORRECTION 2 : On cible net10.0 (regarde le paramètre -f)
         run: |
-          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:PublishSingleFile=true -p:SelfContained=true /p:GenerateAppxPackageOnBuild=false /p:PublishClickOnce=true /p:AppxPackage=false /p:GenerateManifests=True
+          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:PublishSingleFile=true -p:SelfContained=true /p:GenerateAppxPackageOnBuild=false /p:PublishClickOnce=true /p:AppxPackage=false /p:GenerateManifests=True /p:PublishReadyToRun=false
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
