@@ -23,7 +23,7 @@ namespace Budget.Mobile.Helpers
                 TypeCategorie.Beaute => "Beauté",
                 TypeCategorie.TelephoneInternet => "Téléphone/Internet",
                 TypeCategorie.DepensesPrinceEdouard2026 => "Dépense Prince Edouard 2026",
-                // Ajoute tous tes autres cas ici...
+                TypeCategorie.Electricite => "Électricité",
                 _ => cat.ToString() // Par défaut, renvoie le nom technique
             };
         }

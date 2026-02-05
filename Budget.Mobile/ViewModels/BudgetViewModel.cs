@@ -77,7 +77,7 @@ namespace Budget.Mobile.ViewModels
 
                     // Calcul du pourcentage pour la barre (0.0 à 1.0)
                     // Si budgetCumuleTheorique est 0, on évite la division par zéro
-                    double progress = budgetCumuleTheorique == 0 ? 1 : (double)(x / budgetCumuleTheorique);
+                    double progress = budgetCumuleTheorique == 0 ? 1 : (double)(x / budgetRestant);
 
                     // On prépare l'affichage
                     var row = new BudgetRow

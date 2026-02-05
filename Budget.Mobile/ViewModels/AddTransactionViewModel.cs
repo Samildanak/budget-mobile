@@ -25,8 +25,15 @@ namespace Budget.Mobile.ViewModels
         public AddTransactionViewModel(DepenseService service)
         {
             _service = service;
-            foreach (TypeCategorie cat in Enum.GetValues(typeof(TypeCategorie)))
+            var categoriesTriees = Enum.GetValues(typeof(TypeCategorie))
+                               .Cast<TypeCategorie>()
+                               .OrderBy(c => c.ToString());
+
+            foreach (var cat in categoriesTriees)
+            {
                 Categories.Add(cat);
+            }
+
             CategorieSelectionnee = TypeCategorie.Alimentation;
         }
 
