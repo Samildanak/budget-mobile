@@ -21,18 +21,16 @@ jobs:
       - name: Install MAUI Workload
         run: dotnet workload install maui
 
-      # LA COMMANDE QUI MARCHE (Step 4)
-      # On désactive ClickOnce, on désactive SingleFile pour éviter les bugs
+      # ON FORCE LE DOSSIER DE SORTIE AVEC "-o"
       - name: Publish Windows App
         run: |
-          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:PublishSingleFile=false -p:SelfContained=true -p:PublishReadyToRun=false
+          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None -p:PublishSingleFile=false -p:SelfContained=true -p:PublishReadyToRun=false -o ./Output
 
-      # On compresse le dossier de sortie en ZIP
+      # On zippe le contenu du dossier qu'on vient de créer
       - name: Zip Build
         run: |
-          Compress-Archive -Path Budget.Mobile/bin/Release/net10.0-windows10.0.19041.0/win10-x64/publish/* -DestinationPath BudgetApp-Windows.zip
+          Compress-Archive -Path ./Output/* -DestinationPath BudgetApp-Windows.zip
 
-      # On rend le ZIP disponible en téléchargement dans l'onglet "Actions" de GitHub
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
