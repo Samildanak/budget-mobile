@@ -8,6 +8,13 @@
              Title="Nouvelle Transaction"
              BackgroundColor="#F5F5F5">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:CategoryNameConverter x:Key="CategoryNameConverter" />
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20">
 
@@ -41,7 +48,7 @@
                         <Picker Title="Choisir une catégorie"
                                 ItemsSource="{Binding Categories}"
                                 SelectedItem="{Binding CategorieSelectionnee}"
-                                ItemDisplayBinding="{Binding ., Converter={StaticResource CatNameConverter}}" />
+                                ItemDisplayBinding="{Binding ., Converter={StaticResource CategoryNameConverter}}" />
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
