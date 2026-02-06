@@ -36,8 +36,7 @@ jobs:
       # Compilation + Signature en une seule commande
       - name: Publish Android APK
         run: |
-          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=budget-app.keystore -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASSWORD }} -p:AndroidSigningStorePass=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -o ./Output
-
+          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=budget-app.keystore -p:AndroidSigningKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" -p:AndroidSigningKeyPass="${{ secrets.ANDROID_KEY_PASSWORD }}" -p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" -o ./Output
       # On sauvegarde l'APK signé
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
