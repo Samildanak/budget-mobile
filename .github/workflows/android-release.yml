@@ -27,11 +27,10 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
 
-      # On recrée le fichier keystore à partir du secret
       - name: Restore Keystore
         run: |
           $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.ANDROID_KEYSTORE_BASE64 }}")
-          [IO.File]::WriteAllBytes("budget-app.keystore", $pfx_cert_byte)
+          [IO.File]::WriteAllBytes("Budget.Mobile/budget-app.keystore", $pfx_cert_byte)
 
       # Compilation + Signature en une seule commande
       - name: Publish Android APK
