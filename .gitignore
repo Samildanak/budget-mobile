@@ -6,3 +6,5 @@ obj/
 [Dd]ebug/
 [Rr]elease/
 publish/
+*.keystore
+base64_keystore.txt

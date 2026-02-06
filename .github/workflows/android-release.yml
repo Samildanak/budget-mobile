@@ -1,62 +1,53 @@
-name: Android Release
+name: Build & Release Android App
 
-# DÉCLENCHEUR : Uniquement quand on pousse un Tag qui commence par 'v' (ex: v1.0.0)
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build-android:
-    runs-on: ubuntu-latest
-    
-    steps:
-      # 1. Récupérer le code source
-      - uses: actions/checkout@v3
+  build:
+    runs-on: windows-latest
 
-      # 2. Installer .NET 8 (Adapte si tu utilises .NET 7)
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
 
-      # 3. Installer la charge de travail MAUI
       - name: Install MAUI Workload
         run: dotnet workload install maui-android
 
-      # 4. Le Tour de Magie : On recrée le fichier keystore depuis le Secret GitHub
-      - name: Decode Keystore
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > budget-app.keystore
-
-      - name: Verify Keystore Content
-        run: |
-          ls -l budget-app.keystore
-          keytool -list -v -keystore budget-app.keystore -alias "${{ secrets.ANDROID_KEYSTORE_ALIAS }}" -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-
-      # 5. Compilation et Signature
-      # On injecte les mots de passe ici via les arguments /p:
-      - name: Publish Android APK
-        env:
-          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
-        run: |
-          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-android -c Release \
-            /p:TargetFrameworks=net10.0-android \
-            /p:AndroidKeyStore=true \
-            /p:AndroidSigningKeyStore=${{ github.workspace }}/budget-app.keystore \
-            /p:AndroidSigningKeyAlias="$KEYSTORE_ALIAS" \
-            /p:AndroidSigningStorePass="$KEYSTORE_PASS" \
-            /p:AndroidSigningKeyPass="$KEYSTORE_PASS" \
-            /p:AndroidPackageFormat=apk
-
-      # 6. Créer la Release GitHub et uploader l'APK
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          files: |
-            # On cible uniquement le dossier BIN pour éviter les doublons 'obj'
-            Budget.Mobile/bin/Release/net10.0-android/*-Signed.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'microsoft'
+          java-version: '17'
+
+      # On recrée le fichier keystore à partir du secret
+      - name: Restore Keystore
+        run: |
+          $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.ANDROID_KEYSTORE_BASE64 }}")
+          [IO.File]::WriteAllBytes("budget-app.keystore", $pfx_cert_byte)
+
+      # Compilation + Signature en une seule commande
+      - name: Publish Android APK
+        run: |
+          dotnet publish Budget.Mobile/Budget.Mobile.csproj -f net10.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=budget-app.keystore -p:AndroidSigningKeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} -p:AndroidSigningKeyPass=${{ secrets.ANDROID_KEY_PASSWORD }} -p:AndroidSigningStorePass=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -o ./Output
+
+      # On sauvegarde l'APK signé
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BudgetApp-Android
+          path: ./Output/*.apk
+          
+      # (Bonus) On sauvegarde le AAB (pour le Play Store)
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BudgetApp-Android-Store
+          path: ./Output/*.aab
