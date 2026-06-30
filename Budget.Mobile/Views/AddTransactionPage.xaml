@@ -30,7 +30,38 @@
 
                     <VerticalStackLayout>
                         <Label Text="Description" TextColor="#2C3E50" FontAttributes="Bold"/>
-                        <Entry Text="{Binding Description}" Placeholder="Ex: Courses, Loyer..." />
+                        <Entry Text="{Binding Description, Mode=TwoWay}" Placeholder="Ex: Courses, Loyer..." />
+
+                        <!-- Liste des suggestions (S'affiche uniquement s'il y a des résultats) -->
+                        <Frame IsVisible="{Binding ADesSuggestions}" 
+                               BackgroundColor="#EAEAEA" 
+                               CornerRadius="5" 
+                               Padding="2" 
+                               HasShadow="True"
+                               Margin="0,2,0,0">            
+                            <CollectionView ItemsSource="{Binding Suggestions}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Depense">
+                                        <Grid Padding="10">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AddTransactionViewModel}}, Path=SelectionnerSuggestionCommand}"
+                                CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
+                                            <StackLayout Orientation="Horizontal" Spacing="10">
+                                                <Label Text="{Binding Description}" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+                                                <Label Text="➔" TextColor="Gray" VerticalOptions="Center"/>
+                                                <!-- Utilisation de ton convertisseur pour afficher le joli nom de la catégorie -->
+                                                <Label Text="{Binding Categorie, Converter={StaticResource CategoryNameConverter}}" 
+                                   TextColor="#512BD4" 
+                                   FontSize="13"
+                                   VerticalOptions="Center"/>
+                                            </StackLayout>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Frame>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout>

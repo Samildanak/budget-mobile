@@ -14,7 +14,7 @@
 
     <Grid RowDefinitions="Auto, *">
         <Frame Grid.Row="0" Margin="10" Padding="15" BackgroundColor="White" CornerRadius="10">
-            <Label Text="État de santé budgétaire (Janvier - Aujourd'hui)" 
+            <Label Text="{Binding TitreSanteBudgetaire}"
                    HorizontalOptions="Center" FontAttributes="Bold"/>
         </Frame>
 

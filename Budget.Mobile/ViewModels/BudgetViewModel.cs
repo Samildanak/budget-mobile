@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Graphics; // Pour les couleurs
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace Budget.Mobile.ViewModels
 {
@@ -15,6 +16,21 @@ namespace Budget.Mobile.ViewModels
 
         // La liste que l'écran va afficher
         public ObservableCollection<BudgetRow> LignesBudget { get; } = new();
+
+        public string TitreSanteBudgetaire
+        {
+            get
+            {
+                // 1. Récupère le mois actuel en français (ex: "février")
+                string mois = DateTime.Now.ToString("MMMM", new CultureInfo("fr-FR"));
+
+                // 2. Met la première lettre en majuscule ("Février")
+                string moisMajuscule = char.ToUpper(mois[0]) + mois.Substring(1);
+
+                // 3. Retourne la phrase complète
+                return $"État de santé budgétaire ({moisMajuscule})";
+            }
+        }
 
         public BudgetViewModel(DepenseService service)
         {
@@ -56,20 +72,20 @@ namespace Budget.Mobile.ViewModels
                     }
 
                     var depensesCategorie = toutesDepenses
-                        .Where(d => d.Categorie == ligne.Categorie && !d.Est_Revenu)
+                        .Where(d => d.Categorie == ligne.Categorie)
                         .ToList();
 
                     decimal totalAnnee = depensesCategorie
                         .Where(d => d.Date_Depense.Year == now.Year)
-                        .Sum(d => d.Montant);
+                        .Sum(d => d.Est_Revenu ? -d.Montant : d.Montant);
 
                     decimal x = depensesCategorie
                         .Where(d => d.Date_Depense.Year == now.Year && d.Date_Depense.Month == moisEnCours)
-                        .Sum(d => d.Montant);
+                        .Sum(d => d.Est_Revenu ? -d.Montant : d.Montant);
 
                     decimal depensesPrecedente = depensesCategorie
                         .Where(d => d.Date_Depense.Year == now.Year && d.Date_Depense.Month < moisEnCours)
-                        .Sum(d => d.Montant);
+                        .Sum(d => d.Est_Revenu ? -d.Montant : d.Montant);
 
                     // Combien il reste VRAIMENT
                     decimal reste = budgetCumuleTheorique - totalAnnee;
