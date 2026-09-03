@@ -11,6 +11,7 @@
         <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate views:DashboardPage}" />
         <ShellContent Title="Budgets" ContentTemplate="{DataTemplate views:BudgetPage}" />
         <ShellContent Title="Ajouter" ContentTemplate="{DataTemplate views:AddTransactionPage}" />
+        <ShellContent Title="Projets" ContentTemplate="{DataTemplate views:ProjetsPage}" />
         <ShellContent Title="Calendrier" ContentTemplate="{DataTemplate views:CalendarPage}" />
         <ShellContent Title="Historique" ContentTemplate="{DataTemplate views:TransactionsPage}" />
     </TabBar>

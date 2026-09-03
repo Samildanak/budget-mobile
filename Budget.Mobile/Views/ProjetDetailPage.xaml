@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Budget.Mobile.ViewModels"
+             x:Class="Budget.Mobile.Views.ProjetDetailPage"
+             x:DataType="vm:ProjetDetailViewModel"
+             Title="{Binding NomProjet}"
+             BackgroundColor="#F5F5F5">
+
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- 1. En-tête récapitulatif (Même style que CalendarPage) -->
+        <Border Grid.Row="0" 
+                Margin="12,12,12,6" 
+                Padding="16" 
+                StrokeShape="RoundRectangle 16" 
+                StrokeThickness="0"
+                BackgroundColor="#2C3E50">
+            <VerticalStackLayout Spacing="10">
+
+                <Label Text="{Binding NomProjet}" 
+                       TextColor="White" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center" />
+
+                <BoxView HeightRequest="1" Color="#4A6572" Margin="0,4"/>
+
+                <!-- 3 Colonnes : Entrées / Sorties / Solde -->
+                <Grid ColumnDefinitions="*, *, *">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Entrées" TextColor="#BDC3C7" HorizontalOptions="Center" FontSize="11"/>
+                        <Label Text="{Binding TotalEntrees, StringFormat='{0:C0}'}" 
+                               TextColor="#27AE60" 
+                               HorizontalOptions="Center" 
+                               FontAttributes="Bold" 
+                               FontSize="16"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                        <Label Text="Sorties" TextColor="#BDC3C7" HorizontalOptions="Center" FontSize="11"/>
+                        <Label Text="{Binding TotalSorties, StringFormat='{0:C0}'}" 
+                               TextColor="#E74C3C" 
+                               HorizontalOptions="Center" 
+                               FontAttributes="Bold" 
+                               FontSize="16"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="2" Spacing="2">
+                        <Label Text="Solde" TextColor="#BDC3C7" HorizontalOptions="Center" FontSize="11"/>
+                        <Label Text="{Binding Solde, StringFormat='{0:C0}'}" 
+                               TextColor="White" 
+                               HorizontalOptions="Center" 
+                               FontAttributes="Bold" 
+                               FontSize="16"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- 2. Liste des transactions du projet -->
+        <RefreshView Grid.Row="1" 
+                     IsRefreshing="{Binding IsBusy}" 
+                     Command="{Binding ChargerDetailsCommand}"
+                     RefreshColor="#2C3E50">
+
+            <CollectionView ItemsSource="{Binding Transactions}" 
+                            Margin="12,6,12,12">
+
+                <!-- Vue vide si aucune transaction n'est associée -->
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Padding="20">
+                        <Label Text="🧾" FontSize="40" HorizontalTextAlignment="Center" />
+                        <Label Text="Aucune transaction trouvée" 
+                               TextColor="#7F8C8D" 
+                               FontSize="15" 
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Les dépenses/revenus ajoutés dans les catégories de ce projet apparaîtront automatiquement ici." 
+                               TextColor="#95A5A6" 
+                               FontSize="12" 
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <!-- Ligne de transaction -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TransactionProjetItem">
+                        <Border Margin="0,4" 
+                                Padding="14,10" 
+                                StrokeShape="RoundRectangle 12" 
+                                Stroke="#E2E8F0"
+                                StrokeThickness="1"
+                                BackgroundColor="White">
+
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Description}" 
+                                           TextColor="#2C3E50" 
+                                           FontAttributes="Bold" 
+                                           FontSize="14"
+                                           LineBreakMode="TailTruncation" />
+
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Label Text="{Binding CategorieNom}" 
+                                               TextColor="#7F8C8D" 
+                                               FontSize="11" />
+                                        <Label Text="•" TextColor="#BDC3C7" FontSize="11" />
+                                        <Label Text="{Binding Date, StringFormat='{0:dd/MM/yyyy}'}" 
+                                               TextColor="#95A5A6" 
+                                               FontSize="11" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <!-- Montant Vert ou Rouge selon le type -->
+                                <Label Grid.Column="1" 
+                                       Text="{Binding MontantSigne}" 
+                                       VerticalOptions="Center" 
+                                       FontAttributes="Bold" 
+                                       FontSize="14">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding EstRevenu}" Value="True">
+                                            <Setter Property="TextColor" Value="#27AE60" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding EstRevenu}" Value="False">
+                                            <Setter Property="TextColor" Value="#E74C3C" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

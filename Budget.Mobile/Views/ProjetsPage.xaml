@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             x:Class="Budget.Mobile.Views.ProjetsPage"
+             x:DataType="vm:ProjetsViewModel"
+             Title="Mes Projets"
+             BackgroundColor="#F5F5F5">
+
+    <RefreshView IsRefreshing="{Binding IsBusy}" 
+                 Command="{Binding ChargerProjetsCommand}"
+                 RefreshColor="#2C3E50">
+
+        <ScrollView Padding="12,16">
+            <!-- Grille fluide s'adaptant à toutes les tailles d'écran -->
+            <FlexLayout BindableLayout.ItemsSource="{Binding Items}"
+                        Wrap="Wrap"
+                        Direction="Row"
+                        JustifyContent="SpaceEvenly"
+                        AlignItems="Center">
+
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="models:ProjetItem">
+                        <Border WidthRequest="155"
+                                HeightRequest="125"
+                                Margin="6,8"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="#E2E8F0"
+                                StrokeThickness="1"
+                                BackgroundColor="White">
+
+                            <!-- Ombre douce pour remplacer les traits noirs épais -->
+                            <Border.Shadow>
+                                <Shadow Brush="#000000"
+                                        Opacity="0.06"
+                                        Radius="8"
+                                        Offset="0,3" />
+                            </Border.Shadow>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProjetsViewModel}}, Path=ItemCliqueCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
+
+                                <!-- Carte Projet standard -->
+                                <VerticalStackLayout IsVisible="{Binding EstProjetNormal}"
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="Center"
+                                                     Spacing="6"
+                                                     Padding="12">
+                                    <Label Text="📁"
+                                           FontSize="22"
+                                           HorizontalOptions="Center" />
+
+                                    <Label Text="{Binding Nom}"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="#2C3E50"
+                                           HorizontalTextAlignment="Center"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2" />
+                                </VerticalStackLayout>
+
+                                <!-- Carte Bouton '+' : look épuré / discret -->
+                                <VerticalStackLayout IsVisible="{Binding EstBoutonAjout}"
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="Center"
+                                                     Spacing="4">
+                                    <Label Text="+"
+                                           FontSize="32"
+                                           TextColor="#7F8C8D"
+                                           FontAttributes="Bold"
+                                           HorizontalOptions="Center" />
+
+                                    <Label Text="Nouveau"
+                                           FontSize="12"
+                                           TextColor="#95A5A6"
+                                           FontAttributes="Bold"
+                                           HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

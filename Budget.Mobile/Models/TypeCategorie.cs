@@ -31,11 +31,12 @@ namespace Budget.Mobile.Models
         Transport = 22,
         Banque = 23,
         Autres = 24,
-        Chalet = 25,
+        RemboursementChalet = 25,
         DepensesPrinceEdouard2026 = 26,
         RemboursementPrinceEdouard2026 = 27,
         Cadeaux = 28,
         Salaire = 29,
-        Remboursement = 30
+        Remboursement = 30,
+        DepenseChalet = 31,
     }
 }

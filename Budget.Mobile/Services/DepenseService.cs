@@ -89,5 +89,49 @@ namespace Budget.Mobile.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<ResumeMois>>($"api/depenses/calendrier/{annee}");
 
         }
+
+        public async Task<List<Projet>> GetProjetsAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetFromJsonAsync<List<Projet>>("api/projets");
+                return response ?? new List<Projet>();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur GetProjetsAsync: {ex.Message}");
+                return new List<Projet>();
+            }
+        }
+
+        public async Task<ProjetDetailsDto?> GetProjetDetailsAsync(int id)
+        {
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<ProjetDetailsDto>($"api/projets/{id}/details");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur GetProjetDetailsAsync: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<int?> CreateProjetAsync(CreateProjetDto dto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/projets", dto);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<int>();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Erreur CreateProjetAsync: {ex.Message}");
+            }
+            return null;
+        }
     }
 }

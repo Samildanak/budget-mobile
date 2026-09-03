@@ -50,6 +50,18 @@ namespace Budget.Mobile
             builder.Services.AddTransient<AddTransactionPage>();
             builder.Services.AddTransient<AddTransactionViewModel>();
 
+            // 5. Projets
+            builder.Services.AddTransient<ProjetsViewModel>();
+            builder.Services.AddTransient<ProjetsPage>();
+
+            // 6. Créer un projet
+            builder.Services.AddTransient<CreateProjetViewModel>();
+            builder.Services.AddTransient<CreateProjetPage>();
+
+            // 7. Détails d'un projet
+            builder.Services.AddTransient<ProjetDetailViewModel>();
+            builder.Services.AddTransient<ProjetDetailPage>();
+
             builder.Services.AddTransient<MainPage>();
 
             return builder.Build();

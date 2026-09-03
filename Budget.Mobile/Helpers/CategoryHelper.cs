@@ -24,6 +24,8 @@ namespace Budget.Mobile.Helpers
                 TypeCategorie.TelephoneInternet => "Téléphone/Internet",
                 TypeCategorie.DepensesPrinceEdouard2026 => "Dépense Prince Edouard 2026",
                 TypeCategorie.Electricite => "Électricité",
+                TypeCategorie.DepenseChalet => "Dépense Chalet",
+                TypeCategorie.RemboursementChalet => "Remboursement Chalet",
                 _ => cat.ToString() // Par défaut, renvoie le nom technique
             };
         }

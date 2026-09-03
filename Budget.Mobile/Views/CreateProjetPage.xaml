@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Budget.Mobile.ViewModels"
+             xmlns:models="clr-namespace:Budget.Mobile.Models"
+             x:Class="Budget.Mobile.Views.CreateProjetPage"
+             x:DataType="vm:CreateProjetViewModel"
+             Title="Nouveau Projet"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="20">
+
+            <!-- 1. Champ Nom du Projet -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="NOM DU PROJET"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           TextColor="#7F8C8D" />
+
+                    <Entry Text="{Binding Nom}"
+                           Placeholder="Ex: Rénovation Cuisine, Voyage Japon..."
+                           PlaceholderColor="#BDC3C7"
+                           TextColor="#2C3E50"
+                           FontSize="16" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 2. Sélection des Catégories d'Entrées -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="+" TextColor="#27AE60" FontSize="16" FontAttributes="Bold" />
+                        <Label Text="CATÉGORIES D'ENTRÉES"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               TextColor="#7F8C8D"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <FlexLayout BindableLayout.ItemsSource="{Binding CategoriesEntrees}"
+                                Wrap="Wrap"
+                                Direction="Row">    
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:SelectableCategory">
+                                <Border StrokeShape="RoundRectangle 18"
+                                        Margin="4,4"
+                                        Padding="12,8"
+                                        StrokeThickness="1"
+                                        Stroke="{Binding CouleurBordure}"
+                                        BackgroundColor="{Binding CouleurFond}">        
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Label Text="{Binding Nom}"
+                                           FontSize="13"
+                                           TextColor="{Binding CouleurTexte}"
+                                           FontAttributes="{Binding IsSelected, Converter={x:Null}}" /> 
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 3. Sélection des Catégories de Sorties -->
+            <Border StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="-" TextColor="#E74C3C" FontSize="16" FontAttributes="Bold" />
+                        <Label Text="CATÉGORIES DE SORTIES"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               TextColor="#7F8C8D"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <FlexLayout BindableLayout.ItemsSource="{Binding CategoriesSorties}"
+                                Wrap="Wrap"
+                                Direction="Row">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:SelectableCategory">
+                                <Border StrokeShape="RoundRectangle 18"
+                                        Margin="4,4"
+                                        Padding="12,8"
+                                        StrokeThickness="1"
+                                        Stroke="{Binding CouleurBordure}"
+                                        BackgroundColor="{Binding CouleurFond}">
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                    </Border.GestureRecognizers>
+
+                                    <Label Text="{Binding Nom}"
+                                           FontSize="13"
+                                           TextColor="{Binding CouleurTexte}" />
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Message d'erreur éventuel -->
+            <Label Text="{Binding MessageErreur}"
+                   TextColor="#E74C3C"
+                   FontSize="13"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="{Binding MessageErreur, Converter={StaticResource StringNotEmptyConverter}, FallbackValue=False}" />
+
+            <!-- Bouton Créer propre -->
+            <!-- Remplacer le bouton par cette version propre et directe -->
+            <Button Text="Créer le projet"
+                    BackgroundColor="#2C3E50"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    Margin="0,10,0,15"
+                    Command="{Binding SauvegarderCommand}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                   IsVisible="{Binding IsBusy}"
+                   Color="#2C3E50"
+                   HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
