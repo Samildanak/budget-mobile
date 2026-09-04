@@ -27,7 +27,8 @@ jobs:
       shell: powershell
       run: |
         $bytes = [System.Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}")
-        [System.IO.File]::WriteAllBytes("BudgetDev.pfx", $bytes)
+        # On écrit le certificat à la racine du workspace
+        [System.IO.File]::WriteAllBytes("$pwd\BudgetDev.pfx", $bytes)
 
     - name: Compiler et packager en MSIX
       shell: powershell
@@ -35,13 +36,16 @@ jobs:
         $buildNum = "${{ github.run_number }}"
         $pkgVersion = "1.0.$buildNum.0"
         
+        # Récupération du chemin absolu propre vers le certificat
+        $certPath = (Resolve-Path "BudgetDev.pfx").Path
+        
         dotnet publish Budget.Mobile/Budget.Mobile.csproj `
           -f net9.0-windows10.0.19041.0 `
           -c Release `
           -r win-x64 `
           -p:GenerateAppxPackageOnBuild=true `
           -p:AppxPackageSigningEnabled=true `
-          -p:PackageCertificateKeyFile="../../BudgetDev.pfx" `
+          -p:PackageCertificateKeyFile="$certPath" `
           -p:PackageCertificatePassword="${{ secrets.WINDOWS_CERT_PASSWORD }}" `
           -p:ApplicationDisplayVersion="1.0.0" `
           -p:ApplicationVersion=$buildNum `
