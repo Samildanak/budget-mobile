@@ -43,8 +43,8 @@ jobs:
       shell: powershell
       run: |
         $buildNum = "${{ github.run_number }}"
-        $pkgVersion = "1.0.$buildNum.0"
-        
+        $fullVersion = "1.0.$buildNum.0"
+
         dotnet publish Budget.Mobile/Budget.Mobile.csproj `
           -f net9.0-windows10.0.19041.0 `
           -c Release `
@@ -53,9 +53,7 @@ jobs:
           -p:AppxPackageSigningEnabled=true `
           -p:PackageCertificateThumbprint="$env:CERT_THUMBPRINT" `
           -p:ApplicationDisplayVersion="1.0.0" `
-          -p:ApplicationVersion=$buildNum `
-          -p:PackageVersion=$pkgVersion `
-          -p:AppxPackageDir="publish/"
+          -p:ApplicationVersion="$fullVersion"
 
     - name: Préparer les fichiers de distribution
       shell: powershell
