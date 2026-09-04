@@ -58,24 +58,32 @@ jobs:
           -p:AppxPackageDir="publish/"
 
     - name: Préparer les fichiers de distribution
-      shell: powershell
-      run: |
-        # 1. Rechercher le MSIX généré dans l'ensemble du projet
-        $msix = Get-ChildItem -Path . -Filter *.msix -Recurse | Where-Object { $_.FullName -notmatch '\\obj\\' } | Select-Object -First 1
+        shell: powershell
+        run: |
+          # 1. Localiser le fichier MSIX généré (en excluant les dossiers obj)
+          $msix = Get-ChildItem -Path . -Filter *.msix -Recurse | Where-Object { $_.FullName -notmatch '\\obj\\' } | Select-Object -First 1
 
-        if (-not $msix) {
-            Write-Error "Aucun fichier .msix n'a été trouvé après le build !"
-            exit 1
-        }
+          if (-not $msix) {
+              Write-Error "Aucun fichier .msix n'a été trouvé après le build !"
+              exit 1
+          }
 
-        Write-Host "MSIX trouvé : $($msix.FullName)"
-        Copy-Item -Path $msix.FullName -Destination "BudgetApp.msix" -Force
+          Write-Host "MSIX trouvé : $($msix.FullName)"
+          Copy-Item -Path $msix.FullName -Destination "BudgetApp.msix" -Force
 
-        # 2. Mettre à jour la version dans BudgetApp.appinstaller
-        $pkgVersion = "1.0.${{ github.run_number }}.0"
-        (Get-Content BudgetApp.appinstaller) -replace 'Version="[0-9\.]+"', "Version=""$pkgVersion""" | Set-Content BudgetApp.appinstaller
-        Write-Host "BudgetApp.appinstaller mis à jour avec la version $pkgVersion"
-        
+          # 2. Mise à jour chirurgicale de la version dans BudgetApp.appinstaller (sans toucher au prologue XML)
+          $pkgVersion = "1.0.${{ github.run_number }}.0"
+          $installerPath = "$pwd\BudgetApp.appinstaller"
+
+          $content = Get-Content -Path $installerPath -Raw
+          $content = $content -replace '(?<=<AppInstaller[^>]*Version=")[^"]+', $pkgVersion
+          $content = $content -replace '(?<=<MainPackage[^>]*Version=")[^"]+', $pkgVersion
+
+          # 3. Sauvegarde en UTF-8 strict SANS signature (sans BOM)
+          $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+          [System.IO.File]::WriteAllText($installerPath, $content, $utf8NoBom)
+          Write-Host "BudgetApp.appinstaller mis à jour en version $pkgVersion"
+          
     # Uploader les 2 fichiers en tant qu'artefacts sur GitHub
     - name: Sauvegarder les artefacts de mise à jour
       uses: actions/upload-artifact@v4

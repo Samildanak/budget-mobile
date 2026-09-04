@@ -5,7 +5,7 @@
     Uri="http://192.168.2.63:8080/BudgetApp.appinstaller">
     
     <MainPackage
-        Name="Budget.Mobile"
+        Name="com.samildanak.budgetapp"
         Publisher="CN=BudgetDev"
         Version="1.0.0.0"
         ProcessorArchitecture="x64"
