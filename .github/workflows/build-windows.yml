@@ -1,0 +1,86 @@
+name: Build and Deploy Windows MAUI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # =======================================================
+  # JOB 1 : Compilation Windows sur les serveurs GitHub Cloud
+  # =======================================================
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v4
+
+    - name: Configuration du SDK .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Installer les Workloads MAUI Windows
+      run: dotnet workload install maui-windows
+
+    - name: Restaurer le certificat de signature
+      shell: powershell
+      run: |
+        $bytes = [System.Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}")
+        [System.IO.File]::WriteAllBytes("BudgetDev.pfx", $bytes)
+
+    - name: Compiler et packager en MSIX
+      shell: powershell
+      run: |
+        $version = "1.0.${{ github.run_number }}.0"
+        dotnet publish Budget.Mobile/Budget.Mobile.csproj `
+          -f net8.0-windows10.0.19041.0 `
+          -c Release `
+          -p:GenerateAppxPackageOnBuild=true `
+          -p:AppxPackageSigningEnabled=true `
+          -p:PackageCertificateKeyFile="../../BudgetDev.pfx" `
+          -p:PackageCertificatePassword="${{ secrets.WINDOWS_CERT_PASSWORD }}" `
+          -p:ApplicationVersion=$version `
+          -p:AppxPackageDir="publish/"
+
+    - name: Préparer les fichiers de distribution
+      shell: powershell
+      run: |
+        $msix = Get-ChildItem -Path "publish/" -Filter *.msix -Recurse | Select-Object -First 1
+        Copy-Item $msix.FullName -Destination "BudgetApp.msix"
+        
+        $version = "1.0.${{ github.run_number }}.0"
+        (Get-Content BudgetApp.appinstaller) -replace 'Version="[0-9\.]+"', "Version=""$version""" | Set-Content BudgetApp.appinstaller
+
+    # Uploader les 2 fichiers en tant qu'artefacts sur GitHub
+    - name: Sauvegarder les artefacts de mise à jour
+      uses: actions/upload-artifact@v4
+      with:
+        name: budget-distrib
+        path: |
+          BudgetApp.msix
+          BudgetApp.appinstaller
+        retention-days: 5
+
+  # =======================================================
+  # JOB 2 : Déploiement local exécuté DIRECTEMENT sur ta Pi
+  # =======================================================
+  deploy-to-pi:
+    needs: build-windows
+    runs-on: [self-hosted]
+
+    steps:
+    # Récupérer l'artefact uploadé par le Job 1
+    - name: Télécharger les artefacts du build
+      uses: actions/download-artifact@v4
+      with:
+        name: budget-distrib
+        path: ./artifacts
+
+    # Copier directement les fichiers dans le dossier Nginx local
+    - name: Déployer dans Nginx
+      run: |
+        cp ./artifacts/BudgetApp.msix /var/www/budget-app/
+        cp ./artifacts/BudgetApp.appinstaller /var/www/budget-app/
+        rm -rf ./artifacts
+        echo "Déploiement terminé dans /var/www/budget-app avec succès !"
