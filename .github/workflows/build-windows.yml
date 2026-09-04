@@ -32,15 +32,21 @@ jobs:
     - name: Compiler et packager en MSIX
       shell: powershell
       run: |
-        $version = "1.0.${{ github.run_number }}.0"
+        $buildNum = "${{ github.run_number }}"
+        $pkgVersion = "1.0.$buildNum.0"
+        
         dotnet publish Budget.Mobile/Budget.Mobile.csproj `
           -f net9.0-windows10.0.19041.0 `
           -c Release `
+          -r win-x64 `
+          --no-restore `
           -p:GenerateAppxPackageOnBuild=true `
           -p:AppxPackageSigningEnabled=true `
           -p:PackageCertificateKeyFile="../../BudgetDev.pfx" `
           -p:PackageCertificatePassword="${{ secrets.WINDOWS_CERT_PASSWORD }}" `
-          -p:ApplicationVersion=$version `
+          -p:ApplicationDisplayVersion="1.0.0" `
+          -p:ApplicationVersion=$buildNum `
+          -p:PackageVersion=$pkgVersion `
           -p:AppxPackageDir="publish/"
 
     - name: Préparer les fichiers de distribution
@@ -49,8 +55,8 @@ jobs:
         $msix = Get-ChildItem -Path "publish/" -Filter *.msix -Recurse | Select-Object -First 1
         Copy-Item $msix.FullName -Destination "BudgetApp.msix"
         
-        $version = "1.0.${{ github.run_number }}.0"
-        (Get-Content BudgetApp.appinstaller) -replace 'Version="[0-9\.]+"', "Version=""$version""" | Set-Content BudgetApp.appinstaller
+        $pkgVersion = "1.0.${{ github.run_number }}.0"
+        (Get-Content BudgetApp.appinstaller) -replace 'Version="[0-9\.]+"', "Version=""$pkgVersion""" | Set-Content BudgetApp.appinstaller
 
     # Uploader les 2 fichiers en tant qu'artefacts sur GitHub
     - name: Sauvegarder les artefacts de mise à jour
