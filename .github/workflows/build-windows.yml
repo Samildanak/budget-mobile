@@ -23,12 +23,21 @@ jobs:
     - name: Installer les Workloads MAUI Windows
       run: dotnet workload install maui-windows
 
-    - name: Restaurer le certificat de signature
+    - name: Importer le certificat de signature dans le magasin Windows
       shell: powershell
       run: |
-        $bytes = [System.Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}")
-        # On écrit le certificat à la racine du workspace
-        [System.IO.File]::WriteAllBytes("$pwd\BudgetDev.pfx", $bytes)
+        # 1. Décoder le PFX depuis le secret GitHub
+        $pfxBytes = [System.Convert]::FromBase64String("${{ secrets.WINDOWS_CERT_BASE64 }}")
+        $pfxPath = "$pwd\BudgetDev.pfx"
+        [System.IO.File]::WriteAllBytes($pfxPath, $pfxBytes)
+
+        # 2. Importer le certificat dans Cert:\CurrentUser\My
+        $securePassword = ConvertTo-SecureString "${{ secrets.WINDOWS_CERT_PASSWORD }}" -AsPlainText -Force
+        $cert = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $securePassword -Exportable
+
+        # 3. Exposer l'empreinte (Thumbprint) pour l'étape suivante
+        echo "CERT_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
+        echo "Certificat importé avec succès. Thumbprint: $($cert.Thumbprint)"
 
     - name: Compiler et packager en MSIX
       shell: powershell
@@ -36,22 +45,17 @@ jobs:
         $buildNum = "${{ github.run_number }}"
         $pkgVersion = "1.0.$buildNum.0"
         
-        # Récupération du chemin absolu propre vers le certificat
-        $certPath = (Resolve-Path "BudgetDev.pfx").Path
-        
         dotnet publish Budget.Mobile/Budget.Mobile.csproj `
           -f net9.0-windows10.0.19041.0 `
           -c Release `
           -r win-x64 `
           -p:GenerateAppxPackageOnBuild=true `
           -p:AppxPackageSigningEnabled=true `
-          -p:PackageCertificateKeyFile="$certPath" `
-          -p:PackageCertificatePassword="${{ secrets.WINDOWS_CERT_PASSWORD }}" `
+          -p:PackageCertificateThumbprint="$env:CERT_THUMBPRINT" `
           -p:ApplicationDisplayVersion="1.0.0" `
           -p:ApplicationVersion=$buildNum `
           -p:PackageVersion=$pkgVersion `
           -p:AppxPackageDir="publish/"
-
     - name: Préparer les fichiers de distribution
       shell: powershell
       run: |
