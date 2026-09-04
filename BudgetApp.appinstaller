@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller 
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+    Version="1.0.0.0"
+    Uri="http://192.168.2.63:8080/BudgetApp.appinstaller">
+    
+    <MainPackage
+        Name="Budget.Mobile"
+        Publisher="CN=BudgetDev"
+        Version="1.0.0.0"
+        ProcessorArchitecture="x64"
+        Uri="http://192.168.2.63:8080/BudgetApp.msix" />
+
+    <UpdateSettings>
+        <OnLaunch HoursBetweenUpdateChecks="0" />
+        <AutomaticBackgroundTask />
+        <ForceUpdateFromAnyVersion>true</ForceUpdateFromAnyVersion>
+    </UpdateSettings>
+</AppInstaller>
