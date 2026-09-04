@@ -77,7 +77,7 @@ namespace Budget.Mobile.ViewModels
             if (depenseASupprimer == null) return;
 
             // Correction 1 : C'est DisplayAlert, pas DisplayAlertAsync
-            bool confirm = await Shell.Current.DisplayAlertAsync("Confirmation",
+            bool confirm = await Shell.Current.DisplayAlert("Confirmation",
                 $"Veux-tu vraiment supprimer : {depenseASupprimer.Description} ?",
                 "Oui", "Non");
 

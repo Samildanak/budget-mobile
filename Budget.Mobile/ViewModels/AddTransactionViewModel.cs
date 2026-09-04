@@ -135,7 +135,7 @@ namespace Budget.Mobile.ViewModels
         {
             if (DepensesEnAttente.Count == 0) return;
 
-            bool confirm = await Shell.Current.DisplayAlertAsync("Validation",
+            bool confirm = await Shell.Current.DisplayAlert("Validation",
                 $"Voulez-vous envoyer ces { DepensesEnAttente.Count } dépenses ?", "Oui", "Non");
 
             if (!confirm) return;
@@ -146,7 +146,7 @@ namespace Budget.Mobile.ViewModels
             }
 
             DepensesEnAttente.Clear();
-            await Shell.Current.DisplayAlertAsync("Succès", "Tout a été envoyé !", "OK");
+            await Shell.Current.DisplayAlert("Succès", "Tout a été envoyé !", "OK");
         }
 
         [RelayCommand]

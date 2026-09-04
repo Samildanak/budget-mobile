@@ -6,7 +6,7 @@ namespace Budget.Mobile.Converters
 {
     public class CategoryNameConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
         {
             // On vérifie si la valeur reçue est bien une catégorie
             if (value is TypeCategorie cat)
@@ -17,7 +17,7 @@ namespace Budget.Mobile.Converters
             return "Inconnu";
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
