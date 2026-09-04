@@ -56,15 +56,26 @@ jobs:
           -p:ApplicationVersion=$buildNum `
           -p:PackageVersion=$pkgVersion `
           -p:AppxPackageDir="publish/"
+
     - name: Préparer les fichiers de distribution
       shell: powershell
       run: |
-        $msix = Get-ChildItem -Path "publish/" -Filter *.msix -Recurse | Select-Object -First 1
-        Copy-Item $msix.FullName -Destination "BudgetApp.msix"
-        
+        # 1. Rechercher le MSIX généré dans l'ensemble du projet
+        $msix = Get-ChildItem -Path . -Filter *.msix -Recurse | Where-Object { $_.FullName -notmatch '\\obj\\' } | Select-Object -First 1
+
+        if (-not $msix) {
+            Write-Error "Aucun fichier .msix n'a été trouvé après le build !"
+            exit 1
+        }
+
+        Write-Host "MSIX trouvé : $($msix.FullName)"
+        Copy-Item -Path $msix.FullName -Destination "BudgetApp.msix" -Force
+
+        # 2. Mettre à jour la version dans BudgetApp.appinstaller
         $pkgVersion = "1.0.${{ github.run_number }}.0"
         (Get-Content BudgetApp.appinstaller) -replace 'Version="[0-9\.]+"', "Version=""$pkgVersion""" | Set-Content BudgetApp.appinstaller
-
+        Write-Host "BudgetApp.appinstaller mis à jour avec la version $pkgVersion"
+        
     # Uploader les 2 fichiers en tant qu'artefacts sur GitHub
     - name: Sauvegarder les artefacts de mise à jour
       uses: actions/upload-artifact@v4
