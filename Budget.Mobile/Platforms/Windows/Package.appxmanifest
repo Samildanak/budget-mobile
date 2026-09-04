@@ -9,8 +9,7 @@
   <!-- Identity alignée avec l'ApplicationId du csproj et le certificat BudgetDev -->
   <Identity
     Name="com.samildanak.budgetapp"
-    Publisher="CN=BudgetDev"
-    Version="$(ApplicationVersion)" />
+    Publisher="CN=BudgetDev" />
 
   <mp:PhoneIdentity PhoneProductId="A9E0B405-AF58-44FD-8E5E-029C3CC1D5C4"
     PhonePublisherId="00000000-0000-0000-0000-000000000000" />
